@@ -8,6 +8,11 @@ h 向左
 l 向右
 ^C 或者 ^D 退出
 
+格子世界中
+@ 代表初始状态
+$ 代表终止状态
+\# 代表当前状态
+
 风格世界
 $ python -m models.cliff_grid_world
 
