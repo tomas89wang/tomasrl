@@ -21,3 +21,7 @@ $ python -m models.wind_grid_world
 
 21点
 $ python -m models.black_jack
+
+测试 sarsa 算法
+$ python test_sarsa.py WindGridWorld-v0
+$ python test_sarsa.py CliffGridWorld-v0
