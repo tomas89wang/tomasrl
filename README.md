@@ -18,3 +18,6 @@ $ python -m models.cliff_grid_world
 
 悬崖世界
 $ python -m models.wind_grid_world
+
+21点
+$ python -m models.black_jack
