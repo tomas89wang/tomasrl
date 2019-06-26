@@ -17,7 +17,6 @@ class CliffGridWorld(gym.Env):
         self.observation_space = spaces.Discrete(grid.states)
         self.action_space = spaces.Discrete(4)
         self.viewer = None
-        self.state = None
         self.steps_beyond_done = None
 
     def reset(self):
@@ -58,7 +57,7 @@ class CliffGridWorld(gym.Env):
                     logger.warn("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
 
-        return self.state, reward, done, {}
+        return grid.state, reward, done, {}
 
     def render(self, mode="human"):
         return self.grid.render(mode)
