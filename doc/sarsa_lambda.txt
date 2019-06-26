@@ -1,0 +1,40 @@
+==============================================================================
+Sarsa Lambda:
+
+    delta = R * gamma * Q(S', A') - Q(S, A)
+    E(S, A) = gamma * lambda * E(S, A) + (1 if S == S(t) else 0)
+    Q(S, A) <- Q(S, A) + alpha * delta * E(S, A)
+
+==============================================================================
+输入: episodes, alpha, gamma, lambda
+输出: Q                 -> 二维表格，第一维是状态，第二维是动作
+------------------------------------------------------------------------------
+
+initialize: set Q(s, a) arbitrarily, for each s in States and a in Actions(s);
+            set Q(terminal state, :) = 0
+
+repeat for each episode in episodes
+    E(s, a) = 0 for each s in States and a in Actions(s)
+    initialize: S <- first state of episode
+    A = policy(Q, S)        # (e.g. e-greedy policy)
+
+    repeat for each step of episode
+        R, S' = perform_action(S, A)
+        A' = policy(Q, S')  # (e.g. e-greedy policy)
+        delta = R + gamma * Q(S', A') - Q(S, A)
+        E(S, A) <- E(S, A) + 1
+        for all s in States, a in Actions(s) do
+            Q(S, A) <- Q(S, A) + alpha * delta * E(s, a)
+            E(s, a) <- gamma * lambda * E(s, a)
+        end for
+        S <- S'; A <- A'
+    until S is terminal state;
+until all episodes are visited;
+
+==============================================================================
+alpha                   -> 学习速率
+gamma                   -> 衰减因子
+lambda_                 -> 
+policy(Q, state)        -> 策略，根据 Q和状态，给出动作，例如 e-greedy
+perform_action(S, A)    -> 在状态S 上执行动作A 返回奖励和新状态 (R, S_)
+==============================================================================

@@ -1,0 +1,31 @@
+==============================================================================
+Sarsa:
+
+    Q(s, a) <- Q(s, a) + alpha * (R + gamma * Q(s', a') - Q(s, a))
+
+==============================================================================
+输入: episodes, alpha, gamma
+输出: Q                 -> 二维表格，第一维是状态，第二维是动作
+------------------------------------------------------------------------------
+
+initialize: set Q(s, a) arbitrarily, for each s in States and a in Actions(s);
+            set Q(terminal state, :) = 0
+
+repeat for each episode in episodes
+    initialize: S <- first state of episode
+    A = policy(Q, S)        # (e.g. e-greedy policy)
+
+    repeat for each step of episode
+        R, S' = perform_action(S, A)
+        A' = policy(Q, S')  # (e.g. e-greedy policy)
+        Q(S, A) <- Q(S, A) + alpha * (R + gamma * Q(S', A') - Q(S, A))
+        S <- S'; A <- A';
+    until S is terminal state;
+until all episodes are visited;
+
+==============================================================================
+alpha                   -> 学习速率
+gamma                   -> 衰减因子
+policy(Q, state)        -> 策略，根据 Q和状态，给出动作，例如 e-greedy
+perform_action(S, A)    -> 在状态S 上执行动作A 返回奖励和新状态 (R, S_)
+==============================================================================
