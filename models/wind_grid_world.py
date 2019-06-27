@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 import gym
-from gym import spaces, logger
+from gym import spaces
 
+from .beyond_done import beyond_done
 from .grid_world import GridWorld, world_play
 
 
@@ -14,19 +15,13 @@ class WindGridWorld(gym.Env):
         grid[3, 7] = 2
         self.observation_space = spaces.Discrete(grid.states)
         self.action_space = spaces.Discrete(4)
-        self.viewer = None
-        self.steps_beyond_done = None
+        self.steps_beyond_done = beyond_done()
         self.wind_values = 0, 0, 0, 1, 1, 1, 2, 2, 1, 0
 
     def reset(self):
+        self.steps_beyond_done.reset()
         self.grid.reset()
-        self.steps_beyond_done = None
         return self.grid.state
-
-    def close(self):
-        if self.viewer:
-            self.viewer.close()
-            self.viewer = None
 
     def step(self, action):
         assert self.action_space.contains(action), \
@@ -44,13 +39,7 @@ class WindGridWorld(gym.Env):
             done = grid.isterminal(grid.set_state(row, col))
             reward = 0 if done else -1
 
-        if done:
-            if self.steps_beyond_done is None:
-                self.steps_beyond_done = 0
-            else:
-                if self.steps_beyond_done == 0:
-                    logger.warn("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
-                self.steps_beyond_done += 1
+        self.steps_beyond_done.step(done)
 
         return grid.state, reward, done, {}
 

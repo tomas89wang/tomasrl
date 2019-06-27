@@ -3,7 +3,9 @@
 import sys, random
 import numpy as np
 import gym
-from gym import spaces, logger
+from gym import spaces
+
+from .beyond_done import beyond_done
 from .hyperspace import hyperspace
 from .getch import getch
 
@@ -114,15 +116,14 @@ class BlackJackCards(gym.Env):
         self.observation_space = spaces.Discrete(420)
         self.action_space = spaces.Discrete(2)
         self.state = None
-        self.viewer = None
-        self.steps_beyond_done = None
+        self.steps_beyond_done = beyond_done()
         self.dealer = Dealer()              # 庄家
         self.player = Player()              # 玩家
         self.cards = Cards()                # 一副扑克牌
         self._hs = hyperspace(10, 21, 2)    # 将状态与索引互相转换
 
     def reset(self):
-        self.steps_beyond_done = None
+        self.steps_beyond_done.reset()
         # objects reset
         cards, dealer, player = self.cards, self.dealer, self.player
         cards.reset()
@@ -145,11 +146,6 @@ class BlackJackCards(gym.Env):
             player.score - 2,
             1 if player.A else 0
         )
-
-    def close(self):
-        if self.viewer:
-            self.viewer.close()
-            self.viewer = None
 
     def make_arena(self):
         cards, dealer, player = self.cards, self.dealer, self.player
@@ -180,19 +176,13 @@ class BlackJackCards(gym.Env):
             gc, gs = player.info()
             done, reward = True, np.sign(gs - ds)
 
-        if done:
-            if self.steps_beyond_done is None:
-                self.steps_beyond_done = 0
-            else:
-                if self.steps_beyond_done == 0:
-                    logger.warn("You are calling 'step()' even though this environment has already returned done = True.  You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
-                self.steps_beyond_done += 1
+        self.steps_beyond_done.step(done)
 
         return self.state, reward, done, {}
 
     def render(self, mode="human"):
         dealer, player = self.dealer, self.player
-        done = self.steps_beyond_done is not None
+        done = self.steps_beyond_done.is_done()
         print("Dealer -> ", end='')
         print("(\033[31m{:s}-{:s}\033[0m)".format(*dealer.cards[0]), end=' ')
         if done:
