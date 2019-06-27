@@ -65,7 +65,8 @@ class BlackJackGamer(object):
         _, point = card
         if point == 'A':
             self.A = True
-        self.score += self._name2i[point]
+        # 凡是超过 21 点的分数，都记为 22 这样状态空间大小可以确定
+        self.score = min(22, self.score + self._name2i[point])
 
     def info(self):
         score = self.score
@@ -105,12 +106,12 @@ class BlackJackCards(gym.Env):
     def __init__(self):
         '''
         状态包含庄家第一张牌    (1-10)
-        玩家的点数              (2-21)
-        玩家是否有可用的 A      (1-2)
+        玩家的点数              (2-22)
+        玩家是否有可用的 A      (0-1)
         一共 10 * 20 * 2 = 400 种不同状态
         动作空间为 (不叫牌，叫牌)
         '''
-        self.observation_space = spaces.Discrete(400)
+        self.observation_space = spaces.Discrete(420)
         self.action_space = spaces.Discrete(2)
         self.state = None
         self.viewer = None
@@ -118,7 +119,7 @@ class BlackJackCards(gym.Env):
         self.dealer = Dealer()              # 庄家
         self.player = Player()              # 玩家
         self.cards = Cards()                # 一副扑克牌
-        self._hs = hyperspace(10, 20, 2)    # 将状态与索引互相转换
+        self._hs = hyperspace(10, 21, 2)    # 将状态与索引互相转换
 
     def reset(self):
         self.steps_beyond_done = None
@@ -136,7 +137,14 @@ class BlackJackCards(gym.Env):
         # 当前状态 (庄家第一张牌，玩家当前分数，玩家是否有 A)
         self.arena = self.make_arena()
         self.state = self.arena.send(None)
-        #self.state = self._hs.index(dealer.cards[0][1], player.score, player.A)
+        return self.state
+
+    def _state(self, hs, n2i, dealer, player):
+        return hs.index(
+            n2i[dealer.cards[0][1]] - 1,
+            player.score - 2,
+            1 if player.A else 0
+        )
 
     def close(self):
         if self.viewer:
@@ -145,16 +153,16 @@ class BlackJackCards(gym.Env):
 
     def make_arena(self):
         cards, dealer, player = self.cards, self.dealer, self.player
-        hs, n2i = self._hs, BlackJackGamer._name2i
-        S = hs.index(n2i[dealer.cards[0][1]], player.score, int(player.A))
+        _state, hs, n2i = self._state, self._hs, BlackJackGamer._name2i
+        S = _state(hs, n2i, dealer, player)
         action = yield S
         while action:
             player(cards.get()[0])
-            S = hs.index(n2i[dealer.cards[0][1]], player.score, int(player.A))
+            S = _state(hs, n2i, dealer, player)
             action = yield S
         while dealer.bid():
             dealer(cards.get()[0])
-        yield hs.index(n2i[dealer.cards[0][1]], player.score, int(player.A))
+        yield _state(hs, n2i, dealer, player)
 
     def step(self, action):
         assert self.action_space.contains(action), \

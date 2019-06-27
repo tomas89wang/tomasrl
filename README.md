@@ -25,11 +25,14 @@ $ python -m models.black_jack
 测试 sarsa 算法  
 $ python test_sarsa.py WindGridWorld-v0  
 $ python test_sarsa.py CliffGridWorld-v0  
+$ python test_sarsa.py BlackJackCards-v0 1000 100  
 
 测试 sarsa-lambda 算法  
-$ python test_lambda.py WindGridWorld-v0  
-$ python test_lambda.py CliffGridWorld-v0  
+$ python test_sarsa_lambda.py WindGridWorld-v0  
+$ python test_sarsa_lambda.py CliffGridWorld-v0  
+$ python test_sarsa_lambda.py BlackJackCards-v0 1000 100  
 
 测试 q-learn 算法  
 $ python test_q_learn.py WindGridWorld-v0  
 $ python test_q_learn.py CliffGridWorld-v0  
+$ python test_q_learn.py BlackJackCards-v0 1000 100  

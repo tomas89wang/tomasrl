@@ -9,6 +9,7 @@ class greedy(object):
         self.Q = Q
  
     def __call__(self, S):
+        assert S is not None
         QS = self.Q[S]
         maxq = QS[QS.argmax()]
         return random.choice([i for i, q in enumerate(QS) if q == maxq])
@@ -24,4 +25,5 @@ class epsilon_greedy(greedy):
         if random.random() > self.epsilon:
             return super(epsilon_greedy, self).__call__(S)
         else:
+            assert S is not None
             return random.randint(0, len(self.Q[S]) - 1)

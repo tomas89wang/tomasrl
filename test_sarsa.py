@@ -7,8 +7,14 @@ import gym
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) != 2:
-        print("Usage: {:s} <model_name>".format(sys.argv[0]))
+
+    argc, argv = len(sys.argv), sys.argv
+    if 1 == argc:
+        print("Usage: {:s} <model_name> [loop] [play_times]".format(argv[0]))
         sys.exit(0)
-    env = gym.make(sys.argv[1])
-    s = sarsa(env)().demo().account()
+
+    obj = sarsa.live_demo(
+        argv[1],
+        loop = 0 if argc < 3 else int(argv[2]),
+        play_times = 1 if argc < 4 else int(argv[3])
+    )
