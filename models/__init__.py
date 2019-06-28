@@ -15,3 +15,8 @@ register(
     id = 'BlackJackCards-v0',
     entry_point = 'models.black_jack:BlackJackCards',
 )
+
+register(
+    id = 'PuckWorld-v0',
+    entry_point = 'models.puck_world:PuckWorld',
+)

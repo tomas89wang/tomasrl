@@ -13,6 +13,9 @@ l 向右
 $ 代表终止状态  
 \# 代表当前状态  
 
+冰球世界
+$ python -m models.puck_world  
+
 风格世界  
 $ python -m models.cliff_grid_world  
 
